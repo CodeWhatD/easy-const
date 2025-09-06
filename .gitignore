@@ -1,4 +1,75 @@
-node_modules
+# 依赖目录:cite[2]:cite[7]
+node_modules/
+.npm
+.pnp
+.pnp.js
+.yarn-integrity
+
+# 构建输出:cite[2]:cite[7]
+dist/
+build/
+out/
+*.vsix
 .vscode-test
-dist
-out
+
+# 日志文件:cite[1]:cite[2]:cite[7]
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# 运行时数据:cite[1]
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 覆盖率报告:cite[1]:cite[2]:cite[7]
+coverage/
+.nyc_output/
+*.lcov
+
+# 缓存目录:cite[2]:cite[7]
+.cache/
+.sass-cache/
+.eslintcache
+
+# 环境变量文件:cite[2]:cite[7]
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 操作系统生成的文件:cite[2]:cite[7]
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE 和编辑器目录:cite[2]:cite[3]:cite[7]
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# TypeScript 缓存:cite[1]
+*.tsbuildinfo
+
+# 可执行文件:cite[8]
+*.exe
+*.out
+*.app
+
+# 可选：本地调试或测试时可能产生的临时文件
+.tmp/
+temp/
