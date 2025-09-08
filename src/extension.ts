@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import * as jsyaml from "js-yaml";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("File Intellisense 插件已激活");
@@ -84,14 +85,17 @@ export function activate(context: vscode.ExtensionContext) {
                 vscode.CompletionItemKind.File
               );
 
-              // 设置插入文本，只插入文件名（不带引号）
-              completionItem.insertText = file.replace(/"/g, '\\"');
-
               // 读取文件内容
               const filePath = path.join(targetFolder, file);
               console.log("文件路径filePath", filePath);
-              console.log("文件路径filePath", fs.readFileSync(filePath, 'utf-8'));
+              // 解析常量yaml文件
+              const yamlContent: YamlContent = jsyaml.load(
+                fs.readFileSync(filePath, "utf-8")
+              );
+              const { name, namespace } = yamlContent;
 
+              // 设置插入文本，只插入文件名（不带引号）
+              completionItem.insertText = `${name}.${namespace}`;
               // 添加详细信息
               completionItem.detail = `文件: ${file}`;
               completionItem.documentation = `完整路径: ${filePath}`;
