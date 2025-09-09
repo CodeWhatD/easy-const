@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import * as jsyaml from "js-yaml";
+import { getAllFiles } from "./utils/files";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("File Intellisense 插件已激活");
@@ -45,10 +46,9 @@ export function activate(context: vscode.ExtensionContext) {
           .text.substring(0, position.character);
 
         // 匹配 useConst(" 模式
+        // TODO: 支持单引号和反引号
         const triggerPattern = new RegExp(`${functionName}\\(\\"([^\\"]*)$`);
         const match = linePrefix.match(triggerPattern);
-        console.log("match", match);
-        console.log("linePrefix", linePrefix);
         if (!match) {
           return undefined;
         }
@@ -58,10 +58,9 @@ export function activate(context: vscode.ExtensionContext) {
 
         try {
           // 读取目标文件夹下的文件
-          const files = fs.readdirSync(targetFolder!);
-
+          const files = getAllFiles(targetFolder!);
           for (const file of files) {
-            const filePath = path.join(targetFolder!, file);
+            const { filename, path: filePath } = file;
             const stat = fs.statSync(filePath);
 
             // 只处理文件，忽略文件夹
@@ -70,24 +69,21 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             // 检查文件扩展名是否符合配置
-            const ext = path.extname(file);
+            const ext = path.extname(filename);
             if (fileExtensions.length === 0 || fileExtensions.includes(ext)) {
               // 如果用户已经输入了部分内容，只显示匹配的文件
               if (
                 currentInput &&
-                !file.toLowerCase().includes(currentInput.toLowerCase())
+                !filename.toLowerCase().includes(currentInput.toLowerCase())
               ) {
                 continue;
               }
 
               const completionItem = new vscode.CompletionItem(
-                file,
+                filename,
                 vscode.CompletionItemKind.File
               );
 
-              // 读取文件内容
-              const filePath = path.join(targetFolder, file);
-              console.log("文件路径filePath", filePath);
               // 解析常量yaml文件
               const yamlContent: YamlContent = jsyaml.load(
                 fs.readFileSync(filePath, "utf-8")
@@ -96,14 +92,14 @@ export function activate(context: vscode.ExtensionContext) {
 
               // 设置插入文本，只插入文件名（不带引号）
               completionItem.insertText = `${name}.${namespace}`;
+              completionItem.label = `${name}.${namespace}`;
               // 添加详细信息
-              completionItem.detail = `文件: ${file}`;
-              completionItem.documentation = `完整路径: ${filePath}`;
+              completionItem.detail = `module: ${namespace}`;
+              completionItem.documentation = `path: ${filePath}`;
 
               // 设置筛选范围，使输入的部分内容能够筛选结果
-              completionItem.filterText = `${functionName}("${file}`;
-              completionItem.sortText = file;
-
+              completionItem.filterText = `${functionName}("${filename}`;
+              completionItem.sortText = filename;
               // 设置范围，确保替换正确的位置
               const startPosition = new vscode.Position(
                 position.line,
